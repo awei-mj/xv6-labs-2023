@@ -1,6 +1,6 @@
 usertrap() called syscall.
 p->trapframe->a7=7 and it represents syscall number.
-previous mode was uder mode.
+previous mode was user mode.
 register a3 refers to variable num
 The kernel crashed because it tries to read the virtual memory address 0, which is not mapped to any physical address. scause indicates it's a Load Page Fault.
 name: initcode pid: 1

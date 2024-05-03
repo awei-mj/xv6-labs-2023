@@ -102,6 +102,7 @@ extern uint64 sys_link(void);
 extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
 extern uint64 sys_trace(void);
+extern uint64 sys_sysinfo(void);
 
 struct syscall {
   uint64 (*fn)(void);
@@ -133,6 +134,7 @@ static struct syscall syscalls[] = {
 [SYS_mkdir]   {sys_mkdir, "mkdir"},
 [SYS_close]   {sys_close, "close"},
 [SYS_trace]   {sys_trace, "trace"},
+[SYS_sysinfo] {sys_sysinfo, "sysinfo"},
 };
 
 void
