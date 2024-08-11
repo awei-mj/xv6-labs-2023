@@ -449,3 +449,10 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
     return -1;
   }
 }
+
+// Print out a pagetable
+void
+vmprint(pagetable_t pagetable)
+{
+  printf("");
+}
