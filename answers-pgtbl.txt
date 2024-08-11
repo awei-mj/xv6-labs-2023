@@ -1,0 +1,2 @@
+syscall fstat can be accelerated by storing a fd-to-stat mapping in the struct usyscall, and when a process creates a file, the page of the stat struct of the file can be made readable by the process. Thus the process could get the file status through usyscall struct without using the fstat syscall.
+
