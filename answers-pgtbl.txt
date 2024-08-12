@@ -1,2 +1,12 @@
 syscall fstat can be accelerated by storing a fd-to-stat mapping in the struct usyscall, and when a process creates a file, the page of the stat struct of the file can be made readable by the process. Thus the process could get the file status through usyscall struct without using the fstat syscall.
 
+Each leaf pte has its corresponding pa, with repspective permission bits.
+
+for pte 0x0000000021fda01b, URXV
+for pte 0x0000000021fd9417, URWV
+for pte 0x0000000021fd9007, RWV
+for pte 0x0000000021fd8c17, URWV
+for pte 0x0000000021fdcc13, URV
+for pte 0x0000000021fdd007, RWV
+for pte 0x0000000020001c0b, RXV
+
