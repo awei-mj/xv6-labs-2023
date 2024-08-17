@@ -2,11 +2,11 @@ syscall fstat can be accelerated by storing a fd-to-stat mapping in the struct u
 
 Each leaf pte has its corresponding pa, with repspective permission bits.
 
-for pte 0x0000000021fda01b, URXV
-for pte 0x0000000021fd9417, URWV
-for pte 0x0000000021fd9007, RWV
-for pte 0x0000000021fd8c17, URWV
-for pte 0x0000000021fdcc13, URV
-for pte 0x0000000021fdd007, RWV
-for pte 0x0000000020001c0b, RXV
+for pte 0x0000000021fda01b, text/code page, R-XU
+for pte 0x0000000021fd9417, data page, RW-U
+for pte 0x0000000021fd9007, guard page, RW--
+for pte 0x0000000021fd8c17, stack page, RW-U
+for pte 0x0000000021fdcc13, usyscall page, R--U
+for pte 0x0000000021fdd007, trapframe page, RW--
+for pte 0x0000000020001c0b, trampoline page, R-X-
 
