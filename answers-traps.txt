@@ -1,0 +1,8 @@
+1. RISC-V assembly
+  1. registers a0, a1, a2, etc. contain arguments to functions. i.e. register a2 holds 13 in main's call to printf.
+  2. The compiler optimized the call to function f in main, and directly store the answer 12 in register a1 at 0x2e. Also, the call to function g is a inline one and is done at 0x1a, by directly adding the argument by 3.
+  3. The function printf is located at 0x65a.
+  4. just after the jalr to printf in main, the value in register ra is 0x38.
+  5. The output of the code is "HE110 World". If RISC-V were big-endian, 57616 doesn't need to change, i should be set to 0x726c6400.
+  6. Whatever random value in register a2 is going to be printed, since according to the calling convention, a0 is the address of the format string, a1 is the value of first integer x, and a2 is assumed to be storing the value of second integer y.
+
