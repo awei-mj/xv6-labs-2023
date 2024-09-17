@@ -91,6 +91,8 @@ struct proc {
   int killed;                  // If non-zero, have been killed
   int xstate;                  // Exit status to be returned to parent's wait
   int pid;                     // Process ID
+  int interval;                // Alarm inerval
+  uint64 handler;              // Alarm handler
 
   // wait_lock must be held when using this:
   struct proc *parent;         // Parent process
@@ -104,4 +106,5 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
+  uint64 ticks_since_handler;   // Sum of timer intr times
 };

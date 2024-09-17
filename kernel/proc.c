@@ -146,6 +146,11 @@ found:
   p->context.ra = (uint64)forkret;
   p->context.sp = p->kstack + PGSIZE;
 
+  // Set up signal interface
+  p->interval = 0;
+  p->handler = -1ull;
+  p->ticks_since_handler = 0;
+
   return p;
 }
 
