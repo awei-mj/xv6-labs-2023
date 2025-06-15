@@ -71,13 +71,12 @@ usertrap(void)
       // timer intr
       if(p->interval != 0) {
         p->ticks_since_handler += 1;
-        if(p->ticks_since_handler == p->interval) {
-          p->ticks_since_handler = 0;
-          if(p->handler != -1ull) {
-            // TODO: invoke handler
-            // save the context and change epc/sp
-            p->trapframe->epc = p->handler;
-          }
+        if((p->ticks_since_handler >= p->interval) && !p->user_in_handler) {
+          // invoke the handler of sigalarm
+          // save the context and change epc/sp
+          p->user_in_handler = 1;
+          save_sigcontext(p->trapframe, &p->sigctx);
+          p->trapframe->epc = p->handler;
         }
       }
     }
@@ -233,3 +232,84 @@ devintr()
   }
 }
 
+void sigreturn()
+{
+  struct proc *p = myproc();
+  // restore the saved context TODO:
+  restore_sigcontext(p->trapframe, &p->sigctx);
+  
+  // reset the user_in_handler flag
+  p->user_in_handler = 0;
+  p->ticks_since_handler = 0;
+}
+
+void save_sigcontext(struct trapframe *tf, struct sigcontext *sc)
+{
+  sc->epc = tf->epc;
+  sc->ra = tf->ra;
+  sc->sp = tf->sp;
+  sc->gp = tf->gp;
+  sc->tp = tf->tp;
+  sc->t0 = tf->t0;
+  sc->t1 = tf->t1;
+  sc->t2 = tf->t2;
+  sc->s0 = tf->s0;
+  sc->s1 = tf->s1;
+  sc->a0 = tf->a0;
+  sc->a1 = tf->a1;
+  sc->a2 = tf->a2;
+  sc->a3 = tf->a3;
+  sc->a4 = tf->a4;
+  sc->a5 = tf->a5;
+  sc->a6 = tf->a6;
+  sc->a7 = tf->a7;
+  sc->s2 = tf->s2;
+  sc->s3 = tf->s3;
+  sc->s4 = tf->s4;
+  sc->s5 = tf->s5;
+  sc->s6 = tf->s6;
+  sc->s7 = tf->s7;
+  sc->s8 = tf->s8;
+  sc->s9 = tf->s9;
+  sc->s10 = tf->s10;
+  sc->s11 = tf->s11;
+  sc->t3 = tf->t3;
+  sc->t4 = tf->t4;
+  sc->t5 = tf->t5;
+  sc->t6 = tf->t6;
+}
+void restore_sigcontext(struct trapframe *tf, struct sigcontext *sc)
+{
+  tf->epc = sc->epc;
+  tf->ra = sc->ra;
+  tf->sp = sc->sp;
+  tf->gp = sc->gp;
+  tf->tp = sc->tp;
+  tf->t0 = sc->t0;
+  tf->t1 = sc->t1;
+  tf->t2 = sc->t2;
+  tf->s0 = sc->s0;
+  tf->s1 = sc->s1;
+  tf->a0 = sc->a0;
+  tf->a1 = sc->a1;
+  tf->a2 = sc->a2;
+  tf->a3 = sc->a3;
+  tf->a4 = sc->a4;
+  tf->a5 = sc->a5;
+  tf->a6 = sc->a6;
+  tf->a7 = sc->a7;
+  tf->s2 = sc->s2;
+  tf->s3 = sc->s3;
+  tf->s4 = sc->s4;
+  tf->s5 = sc->s5;
+  tf->s6 = sc->s6;
+  tf->s7 = sc->s7;
+  tf->s8 = sc->s8;
+  tf->s9 = sc->s9;
+  tf->s10 = sc->s10;
+  tf->s11 = sc->s11;
+  tf->t3 = sc->t3;
+  tf->t4 = sc->t4;
+  tf->t5 = sc->t5;
+  tf->t6 = sc->t6;
+}

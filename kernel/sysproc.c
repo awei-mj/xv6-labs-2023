@@ -117,6 +117,6 @@ sys_sigalarm(void)
 uint64
 sys_sigreturn(void)
 {
-  // for now, just return zero
+  sigreturn();
   return 0;
 }

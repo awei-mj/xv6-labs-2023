@@ -148,8 +148,9 @@ found:
 
   // Set up signal interface
   p->interval = 0;
-  p->handler = -1ull;
+  p->handler = 0ull;
   p->ticks_since_handler = 0;
+  p->user_in_handler = 0; // handler has not been called yet
 
   return p;
 }
