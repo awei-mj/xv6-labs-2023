@@ -102,6 +102,37 @@ e1000_transmit(struct mbuf *m)
   // the TX descriptor ring so that the e1000 sends it. Stash
   // a pointer so that it can be freed after sending.
   //
+  uint32 tdt = regs[E1000_TDT];
+  struct tx_desc *desc = &tx_ring[tdt];
+
+  if (!(desc->status & E1000_TXD_STAT_DD)) {
+    // the descriptor is not ready, return an error.
+    return -1;
+  } else {
+    // descriptor is free, program it.
+    if (m->len > MBUF_SIZE) {
+      // the mbuf is too large, return an error.
+      mbuffree(m);
+      return -1;
+    }
+
+    // if there is an old mbuf, free it.
+    if(tx_mbufs[tdt]) {
+      mbuffree(tx_mbufs[tdt]);
+      tx_mbufs[tdt] = 0; // clear the old mbuf pointer
+    }
+
+    desc->addr = (uint64)m->head;
+    desc->length = m->len;
+    desc->cmd = E1000_TXD_CMD_RS | E1000_TXD_CMD_EOP; // report status, end of packet
+    desc->status = 0; // clear status
+
+    // stash the mbuf so we can free it later.
+    tx_mbufs[tdt] = m;
+
+    // update the tail pointer to indicate that we've added a packet.
+    regs[E1000_TDT] = (tdt + 1) % TX_RING_SIZE;
+  }
   
   return 0;
 }
@@ -115,6 +146,40 @@ e1000_recv(void)
   // Check for packets that have arrived from the e1000
   // Create and deliver an mbuf for each packet (using net_rx()).
   //
+  uint32 rdt = regs[E1000_RDT];
+  uint32 rdh = regs[E1000_RDH];
+
+  for (uint32 i = (rdt + 1) % RX_RING_SIZE; i != rdh; i = (i + 1) % RX_RING_SIZE) {
+    struct rx_desc *desc = &rx_ring[i];
+
+    if (!(desc->status & E1000_RXD_STAT_DD)) {
+      // no more packets, stop checking.
+      break;
+    }
+
+    // we have a packet, create an mbuf for it.
+    struct mbuf *m = rx_mbufs[i];
+    if (!m) {
+      panic("e1000: no mbuf for received packet");
+    }
+
+    m->len = desc->length;
+
+    // deliver the mbuf to the networking stack.
+    net_rx(m);
+
+    rx_mbufs[i] = mbufalloc(0);
+    if (!rx_mbufs[i])
+      panic("e1000");
+    desc->addr = (uint64)rx_mbufs[i]->head; // reset address
+
+    // reset the descriptor and prepare for the next packet.
+    desc->status = 0; // clear status
+    desc->length = 0; // clear length
+
+    // update the receive descriptor tail pointer.
+    regs[E1000_RDT] = i;
+  }
 }
 
 void
